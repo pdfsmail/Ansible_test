@@ -1,3 +1,6 @@
-[servers]
-svr1 192.168.247.201
-svr2 192.168.247.202
+servers:
+  hosts:
+    svr1:
+      ansible_host: 192.168.247.201
+    svr2:
+      ansible_host: 192.168.247.202
