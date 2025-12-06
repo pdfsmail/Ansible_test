@@ -1,6 +1,16 @@
-servers:
+web_servers:
   hosts:
     svr1:
       ansible_host: 192.168.247.201
+    rockysvr:
+      ansible_host: 192.168.247.204
+
+db_servers:
+  hosts:
     svr2:
       ansible_host: 192.168.247.202
+
+file_servers:
+  hosts:
+    svr3:
+      ansible_host: 192.168.247.203
