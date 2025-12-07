@@ -17,5 +17,4 @@ file_servers:
 
 workstations:
   hosts:
-    ubuntudsk:
-      ansible_host: 192.168.247.134
+    
