@@ -1,0 +1,5 @@
+- name: add ssh for Frank
+  tags: always
+  authorized_key:
+    user: Frank
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEChqbY6gwf38CVgrejNuJOoh9t0ryms8PJSNJFzm8Rr Ansible Test Key"

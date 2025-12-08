@@ -20,114 +20,25 @@
 
  - hosts: all
    become: true
-   tasks:
-
-   - name: add ssh for Frank
-     tags: always
-     authorized_key:
-       user: Frank
-       key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEChqbY6gwf38CVgrejNuJOoh9t0ryms8PJSNJFzm8Rr Ansible Test Key"
+   roles:
+     - base
 
  - hosts: workstations
    become: true
-   tasks:
-
-   - name: install unzip
-     tags: ubuntu,desktop
-     package:
-       name: unzip
-
-   - name: install terraform
-     tags: ubuntu,desktop
-     unarchive:
-       src: https://releases.hashicorp.com/terraform/1.14.1/terraform_1.14.1_linux_amd64.zip
-       dest: /usr/local/bin
-       remote_src: yes
-       mode: 0755
-       owner: root
-       group: root
+   roles:
+     - workstations
 
  - hosts: web_servers
    become: true
-   tasks:
-
-   - name: install apache and php for Ubuntu servers
-     tags: apache,apache2,ubuntu
-     apt:
-       name:
-         - apache2
-         - libapache2-mod-php
-       state: latest
-     when: ansible_distribution == "Ubuntu"
-
-   - name: install apache and php for Rocky servers
-     tags: apache,httpd,rocky
-     dnf:
-       name:
-         - httpd
-         - php
-       state: latest
-     when: ansible_distribution == "Rocky"
-
-   - name: start httpd (Rocky)
-     tags: apache,httpd,rocky
-     service:
-       name: httpd
-       state: started
-       enabled: yes
-     when: ansible_distribution == "Rocky"
-
-   - name: change e-mail for admin
-     tags: apache,rocky,httpd,email
-     lineinfile:
-       path: /etc/httpd/conf/httpd.conf
-       regexp: '^ServerAdmin'
-       line: ServerAdmin someonone@whatever.cc
-     when: ansible_distribution == "Rocky"
-     register: webservice
-
-   - name: Restart httpd (Rocky)
-     tags: apache,httpd,rocky
-     service:
-       name: httpd
-       state: restarted
-     when: webservice.changed
-
-   - name: copy default html file
-     tags: apache,apache2,httpd
-     copy:
-       src: default_site.html
-       dest: /var/www/html/index.html
-       owner: root
-       group: root
-       mode: 0644
-
+   roles:
+     - web_servers
 
  - hosts: db_servers
    become: true
-   tasks:
-
-   - name: install Mariadb Rocky
-     tags: rocky,db,mariadb
-     dnf:
-       name: mariadb
-       state: latest
-     when: ansible_distribution == "Rocky"
-
-   - name: install Mariadb Ubuntu
-     tags: ubuntu,db,mariadb
-     apt:
-       name: mariadb-server
-       state: latest
-     when: ansible_distribution == "Ubuntu"
+   roles:
+     - db_servers
 
  -  hosts: file_servers
     become: true
-    tasks:
-
-    - name: install samba
-      tags: samba
-      package:
-        name: samba
-        state: latest
-
+    roles:
+      - file_servers

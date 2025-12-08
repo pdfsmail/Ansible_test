@@ -1,0 +1,50 @@
+- name: install apache and php for Ubuntu servers
+  tags: apache,apache2,ubuntu
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: install apache and php for Rocky servers
+  tags: apache,httpd,rocky
+  dnf:
+    name:
+      - httpd
+      - php
+    state: latest
+  when: ansible_distribution == "Rocky"
+
+- name: start httpd (Rocky)
+  tags: apache,httpd,rocky
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+  when: ansible_distribution == "Rocky"
+
+- name: change e-mail for admin
+  tags: apache,rocky,httpd,email
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^ServerAdmin'
+    line: ServerAdmin someonone@whatever.cc
+  when: ansible_distribution == "Rocky"
+  register: webservice
+
+- name: Restart httpd (Rocky)
+  tags: apache,httpd,rocky
+  service:
+    name: httpd
+    state: restarted
+  when: webservice.changed
+
+- name: copy default html file
+  tags: apache,apache2,httpd
+  copy:
+    src: default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
