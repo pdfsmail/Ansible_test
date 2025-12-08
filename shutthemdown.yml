@@ -1,0 +1,8 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: Shut down Linux server
+    ansible.builtin.command: shutdown -h now

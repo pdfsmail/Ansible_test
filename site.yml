@@ -4,19 +4,29 @@
    become: true
    pre_tasks:
 
-   - name: install updates (Rocky)
+   - name: update cache (Rocky)
      tags: always
      dnf:
-       update_only: yes
        update_cache: yes
+     changed_when: false
      when: ansible_distribution == "Rocky"
 
-   - name: install updates (Ubuntu)
+   - name: update cache (Ubuntu)
      tags: always
      apt:
-       upgrade: dist
        update_cache: yes
+     changed_when: false
      when: ansible_distribution == "Ubuntu"
+
+ - hosts: all
+   become: true
+   tasks:
+
+   - name: add ssh for Frank
+     tags: always
+     authorized_key:
+       user: Frank
+       key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEChqbY6gwf38CVgrejNuJOoh9t0ryms8PJSNJFzm8Rr Ansible Test Key"
 
  - hosts: workstations
    become: true
@@ -58,6 +68,30 @@
          - php
        state: latest
      when: ansible_distribution == "Rocky"
+
+   - name: start httpd (Rocky)
+     tags: apache,httpd,rocky
+     service:
+       name: httpd
+       state: started
+       enabled: yes
+     when: ansible_distribution == "Rocky"
+
+   - name: change e-mail for admin
+     tags: apache,rocky,httpd,email
+     lineinfile:
+       path: /etc/httpd/conf/httpd.conf
+       regexp: '^ServerAdmin'
+       line: ServerAdmin someonone@whatever.cc
+     when: ansible_distribution == "Rocky"
+     register: webservice
+
+   - name: Restart httpd (Rocky)
+     tags: apache,httpd,rocky
+     service:
+       name: httpd
+       state: restarted
+     when: webservice.changed
 
    - name: copy default html file
      tags: apache,apache2,httpd

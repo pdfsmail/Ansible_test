@@ -1,0 +1,43 @@
+---
+
+ - hosts: all
+   become: true
+   pre_tasks:
+
+   - name: install updates (Rocky)
+     tags: always
+     dnf:
+       update_only: yes
+       update_cache: yes
+     when: ansible_distribution == "Rocky"
+
+   - name: install updates (Ubuntu)
+     tags: always
+     apt:
+       upgrade: dist
+       update_cache: yes
+     when: ansible_distribution == "Ubuntu"
+
+ - hosts: all
+   become: true
+   tasks:
+
+   - name: create user Frank
+     tags: always
+     user:
+       name: Frank
+       groups: root
+
+   - name: add ssh for Frank
+     tags: always
+     authorized_key:
+       user: Frank
+       key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEChqbY6gwf38CVgrejNuJOoh9t0ryms8PJSNJFzm8Rr Ansible Test Key"
+
+   - name: add frank sudoers file
+     tags: always
+     copy:
+       src: sudoer_frank
+       dest: /etc/sudoers.d/frank
+       owner: root
+       group: root
